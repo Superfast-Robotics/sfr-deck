@@ -9,6 +9,11 @@
 
   const active = entry => entry.slide?.classList.contains('is-active');
   const paused = () => document.hidden || deck?.classList.contains('motion-paused');
+  // Match the presentation's displayed pixels rather than oversampling its
+  // fixed 1600x900 design canvas, especially in a narrow browser side panel.
+  const pixelRatio = () => Math.max(.25, Math.min(
+    (window.devicePixelRatio || 1) * Math.min(innerWidth / 1600, innerHeight / 900), 1.25
+  ));
 
   function fallback(entry, error) {
     entry.failed = true;
@@ -34,7 +39,7 @@
       const height = canvas.clientHeight || entry.host.clientHeight;
       const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
       entry.renderer = renderer;
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      renderer.setPixelRatio(pixelRatio());
       renderer.setSize(width, height, false);
       renderer.setClearColor(0x000000, 0);
       renderer.outputColorSpace = T.SRGBColorSpace;
@@ -130,8 +135,7 @@
     window.addEventListener('resize', () => {
       entries.forEach(entry => {
         if (!entry.renderer || entry.failed) return;
-        // The 1600×900 presentation is scaled as one canvas; retain its authored resolution.
-        entry.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+        entry.renderer.setPixelRatio(pixelRatio());
         if (active(entry)) entry.renderer.render(entry.scene.scene, entry.scene.camera);
       });
     });

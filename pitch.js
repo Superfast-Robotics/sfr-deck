@@ -21,17 +21,84 @@
     const status = $("status");
     const baseTitle = document.title;
     const manuallyPaused = new WeakSet();
+    const pendingPlays = new WeakMap();
+    const warmedVideos = new WeakSet();
+    const failedVideos = new WeakSet();
     // This presentation opens playing; Pause/P is the explicit opt-out.
     let motionPaused = false;
-    let current = 0;
+    let current = readHash();
     let openPanel = null;
     let returnFocus = null;
     let touchStart = null;
     let resizeFrame = 0;
+    let warmTimer = 0;
+    let warmGeneration = 0;
+    let clearWarmListeners = () => {};
 
     const announce = (message) => { if (status) status.textContent = message; };
     const activeSlide = () => slides[current];
     const videoIsActive = (video) => activeSlide().contains(video);
+    const shouldPlay = (video) => videoIsActive(video) && video.hasAttribute("data-autoplay") &&
+      !motionPaused && !document.hidden && !manuallyPaused.has(video) && !failedVideos.has(video);
+
+    function warmVideo(video) {
+      if (warmedVideos.has(video) || failedVideos.has(video)) return;
+      if (!video.getAttribute("src") && !video.querySelector("source[src]")) return;
+      warmedVideos.add(video);
+      video.preload = "auto";
+      // Changing preload is sufficient for a video that is already loading.
+      // Never reset an existing buffer or the presenter's playback position.
+      if (video.readyState === 0 && video.networkState !== 2) video.load();
+    }
+
+    function scheduleNeighborMedia() {
+      clearTimeout(warmTimer);
+      clearWarmListeners();
+      const generation = ++warmGeneration;
+      if (document.hidden || motionPaused) return;
+      const activeVideos = [...activeSlide().querySelectorAll("video")].filter(v => !failedVideos.has(v));
+      const activeBufferReady = () => activeVideos.every(video => {
+        if (failedVideos.has(video)) return true;
+        if (video.readyState < 3) return false;
+        for (let range = 0; range < video.buffered.length; range += 1) {
+          if (video.buffered.start(range) > video.currentTime + .05 || video.buffered.end(range) < video.currentTime) continue;
+          const end = video.buffered.end(range);
+          const bufferedSeconds = (end - video.currentTime) / Math.max(video.playbackRate, .1);
+          return bufferedSeconds >= 4 || (Number.isFinite(video.duration) && end >= video.duration - .05);
+        }
+        return false;
+      });
+      const nextVideos = slides.slice(current + 1).flatMap(slide => [...slide.querySelectorAll("video")])
+        .filter(video => !failedVideos.has(video)).slice(0, 2);
+      const valid = () => generation === warmGeneration && !document.hidden && !motionPaused;
+      function prime(index) {
+        if (!valid() || index >= nextVideos.length) return;
+        const video = nextVideos[index];
+        const next = () => {
+          clearWarmListeners();
+          if (valid()) warmTimer = setTimeout(() => prime(index + 1), 300);
+        };
+        if (video.readyState >= 3 || failedVideos.has(video)) { next(); return; }
+        // A canplay event only promises a few frames. Protect several seconds
+        // of current playback before another download shares the connection.
+        // Poll because progress need not produce another canplay event.
+        if (!warmedVideos.has(video) && !activeBufferReady()) {
+          warmTimer = setTimeout(() => prime(index), 250);
+          return;
+        }
+        video.addEventListener("canplay", next, { once:true });
+        video.addEventListener("error", next, { once:true });
+        clearWarmListeners = () => {
+          video.removeEventListener("canplay", next);
+          video.removeEventListener("error", next);
+          clearWarmListeners = () => {};
+        };
+        warmVideo(video);
+      }
+      // Give the current slide first use of the connection; then prepare only
+      // the next two video elements, one at a time rather than the whole deck.
+      warmTimer = setTimeout(() => prime(0), activeVideos.length ? 300 : 500);
+    }
 
     function fit() {
       const scale = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
@@ -94,30 +161,42 @@
     }
 
     function playVideo(video) {
+      if (failedVideos.has(video) || pendingPlays.has(video) || (!video.paused && !video.ended)) return;
       if (!video.currentSrc && !video.getAttribute("src") && !video.querySelector("source[src]")) return;
+      warmVideo(video);
       video.muted = true;
       video.playbackRate = Number(video.dataset.playbackRate) || 1;
       const result = video.play();
       if (result && typeof result.then === "function") {
-        result.then(() => {
+        let aborted = false;
+        const pending = result.then(() => {
           // A play request can resolve after the presenter has moved on.
-          if (!videoIsActive(video) || motionPaused || document.hidden) video.pause();
+          if (!shouldPlay(video)) video.pause();
           else mediaStatus(video, "");
           reflectVideo(video);
         }).catch((error) => {
+          aborted = error.name === "AbortError";
           if (error.name === "AbortError" || !videoIsActive(video)) return;
+          if (failedVideos.has(video)) return;
           if (error.name === "NotAllowedError") mediaStatus(video, "Press play to start the video.");
           else mediaStatus(video, "Video unavailable.", true);
           reflectVideo(video);
+        }).finally(() => {
+          if (pendingPlays.get(video) !== pending) return;
+          pendingPlays.delete(video);
+          // A rapid away/back navigation may abort the old play request after
+          // the new slide sync. Resume only if it is still explicitly wanted.
+          if (aborted && shouldPlay(video)) playVideo(video);
         });
+        pendingPlays.set(video, pending);
       }
     }
 
     function syncMedia() {
       deck.classList.toggle("document-hidden", document.hidden);
       deck.querySelectorAll("video").forEach((video) => {
-        if (videoIsActive(video) && video.hasAttribute("data-autoplay") &&
-            !motionPaused && !document.hidden && !manuallyPaused.has(video)) {
+        if (videoIsActive(video)) warmVideo(video);
+        if (shouldPlay(video)) {
           playVideo(video);
         } else {
           video.pause();
@@ -125,11 +204,13 @@
         }
       });
       deck.querySelectorAll("img[data-animated-src]").forEach((image) => {
-        const running = activeSlide().contains(image) && !motionPaused && !document.hidden && !image.closest('.has-live-motion');
+        const running = activeSlide().contains(image) && !motionPaused && !document.hidden &&
+          !image.closest('.has-live-motion, .has-wall-video');
         const source = running ? image.dataset.animatedSrc : image.dataset.stillSrc;
         if (source && image.getAttribute("src") !== source) image.src = source;
         image.dataset.motionState = running ? "playing" : "paused";
       });
+      scheduleNeighborMedia();
     }
 
     function setMotion(paused) {
@@ -150,11 +231,35 @@
       const grid = $("trial-grid");
       if (!grid || !Array.isArray(window.PITCH_TRIALS)) return;
       grid.replaceChildren();
+      const useWall = Boolean(window.PITCH_MEDIA?.trials?.src);
+      if (useWall) {
+        const wall = document.createElement("video");
+        wall.className = "trial-wall-video";
+        wall.dataset.media = "trials";
+        wall.dataset.autoplay = "";
+        wall.muted = true;
+        wall.loop = true;
+        wall.playsInline = true;
+        wall.preload = "none";
+        wall.setAttribute("aria-label", "18 simultaneous robot evaluation rollouts");
+        wall.addEventListener("loadeddata", () => {
+          if (!failedVideos.has(wall)) grid.classList.add("wall-ready");
+        });
+        wall.addEventListener("error", () => {
+          failedVideos.add(wall);
+          wall.pause();
+          wall.hidden = true;
+          grid.classList.remove("has-wall-video", "wall-ready");
+          syncMedia();
+        });
+        grid.classList.add("has-wall-video");
+        grid.prepend(wall);
+      }
       window.PITCH_TRIALS.forEach((item, index) => {
         const figure = document.createElement("figure");
         figure.className = "trial-card";
         figure.dataset.index = String(index + 1);
-        const isVideo = item.type === "video" || /\.(mp4|webm|mov)(?:[?#]|$)/i.test(item.src || "");
+        const isVideo = !useWall && (item.type === "video" || /\.(mp4|webm|mov)(?:[?#]|$)/i.test(item.src || ""));
         const media = document.createElement(isVideo ? "video" : "img");
         if (item.src && (isVideo || !item.poster)) media.src = item.src;
         if (isVideo) {
@@ -192,7 +297,8 @@
       deck.querySelectorAll("video[data-media]").forEach((video) => {
         const source = sources[video.dataset.media];
         if (!source) return;
-        if (source.src) video.src = source.src;
+        video.preload = videoIsActive(video) ? "auto" : "none";
+        if (source.src && video.getAttribute("src") !== source.src) video.src = source.src;
         if (source.poster) video.poster = source.poster;
         if (source.sourceUrl) video.dataset.sourceUrl = source.sourceUrl;
         if (source.title) video.setAttribute("aria-label", source.title);
@@ -202,7 +308,7 @@
         video.muted = true;
         video.loop = true;
         video.playsInline = true;
-        video.preload = "none";
+        video.preload = videoIsActive(video) ? "auto" : "none";
         video.defaultPlaybackRate = Number(video.dataset.playbackRate) || 1;
         video.playbackRate = video.defaultPlaybackRate;
         if (!video.id) video.id = `pitch-video-${index + 1}`;
@@ -232,8 +338,17 @@
         }
         video.addEventListener("play", () => reflectVideo(video));
         video.addEventListener("pause", () => reflectVideo(video));
-        video.addEventListener("error", () => mediaStatus(video, "Video unavailable.", true));
+        video.addEventListener("error", () => {
+          if (video.dataset.media !== "trials") {
+            failedVideos.add(video);
+            mediaStatus(video, "Video unavailable.", true);
+            if (videoIsActive(video)) scheduleNeighborMedia();
+          }
+        });
         video.addEventListener("loadeddata", () => mediaStatus(video, ""));
+        for (const event of ["canplay", "playing"]) video.addEventListener(event, () => {
+          if (videoIsActive(video)) scheduleNeighborMedia();
+        });
         reflectVideo(video);
       });
     }
@@ -434,7 +549,7 @@
     buildOverview();
     fit();
     setMotion(motionPaused);
-    goTo(readHash());
+    goTo(current);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });

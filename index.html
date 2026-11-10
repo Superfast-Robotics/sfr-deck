@@ -22,18 +22,20 @@
   <link rel="stylesheet" href="team-slide.css">
   <link rel="stylesheet" href="ask-slide.css?v=20261110-autoplay">
   <link rel="stylesheet" href="evidence-annotation.css">
-  <script src="media.js" defer></script>
-  <script src="pitch.js?v=20261110-autoplay" defer></script>
+  <link rel="stylesheet" href="jetson-brand.css">
+  <link rel="stylesheet" href="media-performance.css?v=20261110-smooth">
+  <script src="media.js?v=20261110-smooth" defer></script>
+  <script src="pitch.js?v=20261110-smooth" defer></script>
   <script src="assets/vendor/three-r160.min.js" defer></script>
-  <script src="motion-runtime.js" defer></script>
+  <script src="motion-runtime.js?v=20261110-smooth" defer></script>
   <script src="motion-chip.js" defer></script>
   <script src="motion-compression.js" defer></script>
   <script src="motion-lattice.js" defer></script>
   <script src="motion-deployment.js" defer></script>
   <script src="motion-binary-chip.js" defer></script>
   <script src="motion-enhanced.js" defer></script>
-  <script src="cover-orbit.js" defer></script>
-  <script src="team-orbits.js" defer></script>
+  <script src="cover-orbit.js?v=20261110-smooth" defer></script>
+  <script src="team-orbits.js?v=20261110-smooth" defer></script>
 </head>
 <body>
   <main id="viewport" aria-label="Superfast Robotics pitch presentation">
@@ -43,7 +45,7 @@
       </header>
 
       <section class="slide cover is-active" id="slide-1" data-title="Super Tiny Robot Brain" aria-label="Slide 1">
-        <div class="ambient cover-film"><video data-media="hero" data-playback-rate="1" data-autoplay muted loop playsinline preload="metadata" poster="assets/rollout-reel-poster.jpg"></video></div>
+        <div class="ambient cover-film"><video src="assets/rollout-reel-web.mp4" data-media="hero" data-playback-rate="1" data-autoplay muted loop playsinline preload="auto" poster="assets/rollout-reel-poster.jpg"></video></div>
         <div class="cover-shade"></div>
         <canvas class="cover-orbit cover-orbit-back" width="960" height="650" aria-hidden="true"></canvas>
         <div class="cover-copy"><h1>Super <em>Tiny</em><br>Robot Brain</h1><p>Intelligence that fits inside the robot.</p></div>
@@ -59,7 +61,7 @@
           <figure><figcaption><strong>GR00T 2</strong><span>NVIDIA</span></figcaption><div class="media-frame"><video data-media="groot" data-autoplay muted loop playsinline preload="none"></video><button class="media-play" type="button" aria-label="Play or pause GR00T 2 video">Ⅱ</button><p class="media-status" data-media-status hidden></p></div></figure>
         </div>
         <p class="bottom-line">The next challenge is deployment.</p>
-        <template class="notes"><h2>Robot brains are getting better</h2><p>Dream-1: dress folding, can restocking, and fruit pouring. GR00T 2: microscope work, shipping labels, and GR00T 2 Turbo popcorn delivery. Each silent reel contains three 11-second excerpts. Dream-1 footage retains the original research team's encoded 4× speed; no additional speedup is applied.</p><p><a href="https://dreamlabs.ai/research/dream-1/" target="_blank" rel="noopener">Dream Labs: Dream-1</a><br><a href="https://research.nvidia.com/labs/gear/gr00t-2/" target="_blank" rel="noopener">NVIDIA: GR00T 2</a></p><p>Official demonstration clips are included locally for presentation. These are the respective research teams' demonstrations.</p></template>
+        <template class="notes"><h2>Robot brains are getting better</h2><p>Dream-1: AgiBot fruit placement, can restocking, and fruit pouring. GR00T 2: microscope work, shipping labels, and GR00T 2 Turbo popcorn delivery. Each silent reel contains three official demonstrations. Dream-1 retains the sources' encoded speed: 8× for AgiBot, 4× for the two in-house clips; no additional speedup is applied.</p><p><a href="https://dreamlabs.ai/research/dream-1/" target="_blank" rel="noopener">Dream Labs: Dream-1</a><br><a href="https://research.nvidia.com/labs/gear/gr00t-2/" target="_blank" rel="noopener">NVIDIA: GR00T 2</a></p><p>Official demonstration clips are included locally for presentation. These are the respective research teams' demonstrations.</p></template>
       </section>
 
       <section class="slide deployment-slide" id="slide-3" data-title="Two ways to deploy. Two problems." aria-label="Slide 3" aria-hidden="true" inert>
@@ -85,7 +87,7 @@
       <section class="slide economics-slide" id="slide-5" data-title="The onboard trade-off" aria-label="Slide 5" aria-hidden="true" inert>
         <div class="ambient economics-film"><video data-media="robot" data-autoplay muted loop playsinline preload="none"></video></div>
         <h2 class="slide-title">The onboard trade-off</h2>
-        <div class="thor-price"><strong>$5,000</strong><span>Thor T5000 compute module*</span></div>
+        <div class="thor-price"><strong>$5,000</strong><span class="jetson-hardware"><img class="nvidia-hardware-logo" src="assets/nvidia-logo-white.svg" alt="NVIDIA" width="112" height="21">Jetson Thor T5000 compute module*</span></div>
         <div class="duty-cycle"><p><strong>3h</strong> work <span>/</span> <strong>1h</strong> rest</p><div class="cycle-chart" role="img" aria-label="Illustrative duty cycle: three hours working and one hour resting"><i></i><i></i><i></i><i class="rest"></i></div><span>Operating scenario</span></div>
         <p class="economics-takeaway">Downtime eats ROI.</p>
         <p class="qualifier">*NVIDIA module MSRP: $4,999 at 1,000+ units. Duty cycle depends on the robot and workload.</p>
@@ -93,7 +95,7 @@
       </section>
 
       <section class="slide solution-slide" id="slide-6" data-title="$1,000 compute. Continuous work." aria-label="Slide 6" aria-hidden="true" inert>
-        <div class="solution-copy"><p class="eyebrow">OUR GOAL</p><h2>$1,000</h2><p class="price-caption">Orin NX 16 GB compute module*</p><p class="solution-title">Built to keep<br>working.</p><p class="solution-detail">Intelligence, fully on board.</p></div>
+        <div class="solution-copy"><p class="eyebrow">OUR GOAL</p><h2>$1,000</h2><p class="price-caption jetson-hardware"><img class="nvidia-hardware-logo" src="assets/nvidia-logo-black.svg" alt="NVIDIA" width="112" height="21">Jetson Orin NX 16 GB compute module*</p><p class="solution-title">Built to keep<br>working.</p><p class="solution-detail">Intelligence, fully on board.</p></div>
         <div class="onboard-animation" role="img" aria-label="Concept animation: a small onboard chip continuously processes signals">
           <p class="chip-overline">LOCAL INFERENCE</p>
           <div class="chip-scene"><div class="chip-shadow"></div><div class="chip-assembly"><div class="circuit-board"><div class="circuit-trace trace-1"></div><div class="circuit-trace trace-2"></div><div class="circuit-trace trace-3"></div><div class="circuit-trace trace-4"></div><div class="circuit-loop loop-1"></div><div class="circuit-loop loop-2"></div><div class="circuit-loop loop-3"></div><div class="chip-package"><div class="chip-pins pins-horizontal"></div><div class="chip-pins pins-vertical"></div><div class="chip-edge"></div><div class="chip-core"><img src="assets/shared/wordmark.png" alt=""><span>ON BOARD</span><i class="core-scan"></i></div></div></div></div></div>
@@ -133,8 +135,8 @@
           </svg>
           <p class="evidence-signal" aria-hidden="true">We have an<br><em>early signal.</em></p>
         </div>
-        <div class="evidence-video media-frame"><video data-media="demo" data-playback-rate="4" data-autoplay muted loop playsinline preload="none"></video><button class="media-play" type="button" aria-label="Play or pause our robot demonstration">Ⅱ</button><p class="media-status" data-media-status hidden></p></div><p class="evidence-playback">4× playback speed</p>
-        <template class="notes"><h2>Compression transfers to robot intelligence</h2><p>The language-model backbone in Unitree's 6B UnifoLM-WLA-1.0 uses a weight representation roughly 160 times smaller than FP16. This is not a 160-fold reduction in total model memory or processing time.</p><p>All inference ran onboard Jetson Orin NX 16 GB. Compression training used FruitCollection and QAKD. This was an early checkpoint with less than 10% of planned training completed. The presentation plays this footage at 4× speed; the original video’s burned-in 1× label refers to its source recording.</p><p><a href="https://superfastrobotics.com/writings/demo-001.html#setup" target="_blank" rel="noopener">Experiment details</a><br><a href="https://github.com/unitreerobotics/unifolm-wla" target="_blank" rel="noopener">Unitree UnifoLM-WLA</a></p></template>
+        <div class="evidence-video media-frame"><video data-media="demo" data-playback-rate="1" data-autoplay muted loop playsinline preload="none"></video><button class="media-play" type="button" aria-label="Play or pause our robot demonstration">Ⅱ</button><p class="media-status" data-media-status hidden></p></div><p class="evidence-playback">4× playback speed</p>
+        <template class="notes"><h2>Compression transfers to robot intelligence</h2><p>The language-model backbone in Unitree's 6B UnifoLM-WLA-1.0 uses a weight representation roughly 160 times smaller than FP16. This is not a 160-fold reduction in total model memory or processing time.</p><p>All inference ran onboard Jetson Orin NX 16 GB. Compression training used FruitCollection and QAKD. This was an early checkpoint with less than 10% of planned training completed. The presentation plays a streaming derivative with 4× speed encoded into the file; the original video’s burned-in 1× label refers to its source recording.</p><p><a href="https://superfastrobotics.com/writings/demo-001.html#setup" target="_blank" rel="noopener">Experiment details</a><br><a href="https://github.com/unitreerobotics/unifolm-wla" target="_blank" rel="noopener">Unitree UnifoLM-WLA</a></p></template>
       </section>
 
       <section class="slide trials-slide" id="slide-10" data-title="60 successful trials out of 90" aria-label="Slide 10" aria-hidden="true" inert>

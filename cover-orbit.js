@@ -26,7 +26,7 @@
     let time = 0;
     let ratio = 1;
 
-    function point(angle) {
+    function point(angle, target = {}) {
       const x = RADIUS.x * Math.cos(angle);
       const y = RADIUS.y * Math.sin(angle);
       const dx = -RADIUS.x * Math.sin(angle);
@@ -34,14 +34,12 @@
       const tx = dx * cosTilt - dy * sinTilt;
       const ty = dx * sinTilt + dy * cosTilt;
       const length = Math.hypot(tx, ty);
-      return {
-        x:CENTER.x + x * cosTilt - y * sinTilt,
-        y:CENTER.y + x * sinTilt + y * cosTilt,
-        nx:-ty / length,
-        ny:tx / length,
-        depth:Math.sin(angle),
-        tangent:Math.atan2(ty, tx),
-      };
+      target.x = CENTER.x + x * cosTilt - y * sinTilt;
+      target.y = CENTER.y + x * sinTilt + y * cosTilt;
+      target.nx = -ty / length;
+      target.ny = tx / length;
+      target.depth = Math.sin(angle);
+      return target;
     }
 
     function splitPaths(points, draw) {
@@ -67,13 +65,24 @@
     }
 
     const guide = Array.from({ length:321 }, (_, i) => point(i / 320 * TAU));
+    const guidePaths = [];
+    splitPaths(guide, (context, points, near) => {
+      const shape = new Path2D();
+      shape.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i += 1) shape.lineTo(points[i].x, points[i].y);
+      guidePaths.push({ context, shape, near });
+    });
+    const samples = Array.from({ length:221 }, (_, i) => ({
+      progress:i / 220, taper:2.7 * Math.pow(i / 220, 1.7),
+    }));
+    const starSprite = document.createElement('canvas');
+    const starContext = starSprite.getContext('2d');
 
-    function star(context, p) {
-      const scale = 0.74 + 0.24 * (p.depth + 1) / 2;
-      context.save();
-      context.translate(p.x, p.y);
-      context.rotate(TILT - 0.16 + Math.sin(time * 0.35) * 0.06);
-      context.scale(scale, scale);
+    function prepareStar() {
+      starSprite.width = starSprite.height = Math.round(96 * ratio);
+      const context = starContext;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      context.translate(48, 48);
       const glow = context.createRadialGradient(0, 0, 1, 0, 0, 35);
       glow.addColorStop(0, 'rgba(93,130,255,.3)');
       glow.addColorStop(.35, 'rgba(77,113,255,.12)');
@@ -94,6 +103,15 @@
       context.shadowColor = '#557eff';
       context.shadowBlur = 11;
       context.fill();
+    }
+
+    function star(context, p) {
+      const scale = 0.74 + 0.24 * (p.depth + 1) / 2;
+      context.save();
+      context.translate(p.x, p.y);
+      context.rotate(TILT - 0.16 + Math.sin(time * 0.35) * 0.06);
+      context.scale(scale, scale);
+      context.drawImage(starSprite, -48, -48, 96, 96);
       context.restore();
     }
 
@@ -103,18 +121,17 @@
         context.clearRect(0, 0, WIDTH, HEIGHT);
       }
       // The faint complete silhouette keeps the brand orbit legible at every phase.
-      splitPaths(guide, (context, points, near) => {
-        path(context, points);
+      for (const { context, shape, near } of guidePaths) {
         context.strokeStyle = near ? 'rgba(105,144,255,.19)' : 'rgba(105,144,255,.13)';
         context.lineWidth = .65;
-        context.stroke();
-      });
+        context.stroke(shape);
+      }
 
       const angle = START + time / PERIOD * TAU;
-      const samples = Array.from({ length:221 }, (_, i) => {
-        const progress = i / 220;
-        return { ...point(angle - TRAIL * (1 - progress)), progress };
-      });
+      for (const p of samples) {
+        point(angle - TRAIL * (1 - p.progress), p);
+        p.width = .10 + p.taper * (1 + .16 * p.depth);
+      }
       // A soft halo follows the ribbon, rather than filling the whole ellipse.
       splitPaths(samples, (context, points, near) => {
         context.save();
@@ -129,19 +146,18 @@
       });
       const head = samples[samples.length - 1];
       // Each half is one continuous ribbon, avoiding antialiased segment seams.
-      const width = p => .10 + 2.7 * Math.pow(p.progress, 1.7) * (1 + .16 * p.depth);
       splitPaths(samples, (context, points, near) => {
         context.save();
         context.beginPath();
         for (let i = 0; i < points.length; i += 1) {
           const p = points[i];
-          const w = width(p);
+          const w = p.width;
           if (!i) context.moveTo(p.x + p.nx * w, p.y + p.ny * w);
           else context.lineTo(p.x + p.nx * w, p.y + p.ny * w);
         }
         for (let i = points.length - 1; i >= 0; i -= 1) {
           const p = points[i];
-          const w = width(p);
+          const w = p.width;
           context.lineTo(p.x - p.nx * w, p.y - p.ny * w);
         }
         context.closePath();
@@ -160,11 +176,13 @@
     }
 
     function resize() {
-      ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+      const displayScale = Math.min(innerWidth / 1600, innerHeight / 900);
+      ratio = Math.max(.25, Math.min((window.devicePixelRatio || 1) * displayScale, 1.5));
       for (const canvas of [back, front]) {
         canvas.width = Math.round(WIDTH * ratio);
         canvas.height = Math.round(HEIGHT * ratio);
       }
+      prepareStar();
       render();
     }
 

@@ -1,8 +1,15 @@
-/* Local pitch media. The cover reel has 6x speed baked in; play it at 1x.
- * Evaluation GIFs are 4x. Posters provide pause and reduced-motion states. */
+/* Streaming pitch media. Cover is baked at 6x; demo and trial wall at 4x.
+ * Browser playback stays at 1x for efficient hardware decoding.
+ * Original evaluation GIFs remain available as the wall fallback. */
 window.PITCH_MEDIA = {
+  "trials": {
+    "src": "assets/trial-wall.mp4",
+    "poster": "assets/trial-wall-poster.jpg",
+    "title": "18 robot evaluation rollouts, each looping at 4× speed",
+    "sourceUrl": "https://superfastrobotics.com/writings/demo-001.html"
+  },
   "hero": {
-    "src": "assets/rollout-reel.mp4",
+    "src": "assets/rollout-reel-web.mp4",
     "poster": "assets/rollout-reel-poster.jpg",
     "title": "18 Superfast Robotics evaluation rollouts, edited at 6x speed",
     "sourceUrl": "https://superfastrobotics.com/writings/demo-001.html"
@@ -14,25 +21,25 @@ window.PITCH_MEDIA = {
     "sourceUrl": "https://superfastrobotics.com/writings/demo-001.html"
   },
   "demo": {
-    "src": "assets/shared/rollouts/demo-001-silent.mp4",
+    "src": "assets/demo-001-4x.mp4",
     "poster": "assets/shared/demo-001-poster.jpg",
     "title": "Superfast Robotics Demo 001",
     "sourceUrl": "https://superfastrobotics.com/writings/demo-001.html"
   },
   "dream": {
-    "src": "assets/dream-1-reel.mp4",
-    "poster": "assets/dream-1-reel-poster.jpg",
-    "title": "Dream-1: dress folding, can restocking and fruit pouring",
+    "src": "assets/dream-1-reel.mp4?v=20261110-agi",
+    "poster": "assets/dream-1-reel-poster.jpg?v=20261110-agi",
+    "title": "Dream-1: AgiBot fruit placement, can restocking and fruit pouring",
     "sourceUrl": "https://dreamlabs.ai/research/dream-1/"
   },
   "groot": {
-    "src": "assets/groot-2-reel.mp4",
+    "src": "assets/groot-2-reel-web.mp4",
     "poster": "assets/groot-2-reel-poster.jpg",
     "title": "GR00T 2: microscope work, shipping labels and popcorn delivery",
     "sourceUrl": "https://research.nvidia.com/labs/gear/gr00t-2/"
   },
   "factory": {
-    "src": "assets/factory.mp4",
+    "src": "assets/factory-web.mp4",
     "poster": "assets/factory-poster.jpg",
     "title": "Figure 03 at BMW Plant Spartanburg",
     "sourceUrl": "https://www.figure.ai/news/f-03-at-bmw"
