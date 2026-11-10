@@ -1,0 +1,445 @@
+/* Superfast Robotics pitch deck. Plain HTML, no build step. */
+(() => {
+  "use strict";
+
+  function init() {
+    const deck = document.getElementById("deck");
+    if (!deck) return;
+
+    const slides = Array.from(deck.querySelectorAll(".slide"));
+    if (!slides.length) return;
+
+    const $ = (id) => document.getElementById(id);
+    const controls = {
+      previous: $("prev-slide"), next: $("next-slide"),
+      fullscreen: $("fullscreen"), notes: $("toggle-notes"),
+      overview: $("toggle-overview"), motion: $("toggle-motion"),
+    };
+    const notesPanel = $("notes-panel");
+    const overview = $("overview");
+    const viewport = $("viewport");
+    const status = $("status");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const baseTitle = document.title;
+    const manuallyPaused = new WeakSet();
+    let motionPaused = reducedMotion.matches;
+    let motionChosen = false;
+    let current = 0;
+    let openPanel = null;
+    let returnFocus = null;
+    let touchStart = null;
+    let resizeFrame = 0;
+
+    const announce = (message) => { if (status) status.textContent = message; };
+    const activeSlide = () => slides[current];
+    const videoIsActive = (video) => activeSlide().contains(video);
+
+    function fit() {
+      const scale = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+      document.documentElement.style.setProperty("--scale", String(scale));
+      deck.style.setProperty("--scale", String(scale));
+      resizeFrame = 0;
+    }
+
+    function sourceLink(url) {
+      if (!url) return null;
+      try {
+        const resolved = new URL(url, document.baseURI);
+        if (!/^https?:$/.test(resolved.protocol)) return null;
+        const link = document.createElement("a");
+        link.href = resolved.href;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "Watch the official demo";
+        return link;
+      } catch (_) { return null; }
+    }
+
+    function mediaStatus(video, message, includeSource = false) {
+      const frame = video.closest(".media-frame, .trial-card") || video.parentElement;
+      if (!frame) return;
+      let notice = frame.querySelector("[data-media-status]");
+      if (!notice) {
+        notice = document.createElement("p");
+        notice.className = "media-status";
+        notice.dataset.mediaStatus = "";
+        notice.setAttribute("role", "status");
+        frame.append(notice);
+      }
+      notice.replaceChildren();
+      notice.hidden = !message;
+      if (!message) return;
+      notice.append(document.createTextNode(message));
+      const link = includeSource && sourceLink(video.dataset.sourceUrl);
+      if (link) notice.append(document.createTextNode(" "), link);
+    }
+
+    function videoButton(video) {
+      const frame = video.closest(".media-frame, .trial-card") || video.parentElement;
+      return frame && frame.querySelector(".media-play");
+    }
+
+    function reflectVideo(video) {
+      const playing = !video.paused && !video.ended;
+      const frame = video.closest(".media-frame, .trial-card") || video.parentElement;
+      if (frame) {
+        frame.classList.toggle("is-playing", playing);
+        frame.classList.toggle("is-paused", !playing);
+      }
+      const button = videoButton(video);
+      if (!button) return;
+      button.dataset.state = playing ? "playing" : "paused";
+      button.setAttribute("aria-label", playing ? "Pause video" : "Play video");
+      button.setAttribute("aria-pressed", String(playing));
+      button.textContent = playing ? "Ⅱ" : "▶";
+    }
+
+    function playVideo(video) {
+      if (!video.currentSrc && !video.getAttribute("src") && !video.querySelector("source[src]")) return;
+      video.muted = true;
+      video.playbackRate = Number(video.dataset.playbackRate) || 1;
+      const result = video.play();
+      if (result && typeof result.then === "function") {
+        result.then(() => {
+          // A play request can resolve after the presenter has moved on.
+          if (!videoIsActive(video) || motionPaused || document.hidden) video.pause();
+          else mediaStatus(video, "");
+          reflectVideo(video);
+        }).catch((error) => {
+          if (error.name === "AbortError" || !videoIsActive(video)) return;
+          if (error.name === "NotAllowedError") mediaStatus(video, "Press play to start the video.");
+          else mediaStatus(video, "Video unavailable.", true);
+          reflectVideo(video);
+        });
+      }
+    }
+
+    function syncMedia() {
+      deck.classList.toggle("document-hidden", document.hidden);
+      deck.querySelectorAll("video").forEach((video) => {
+        if (videoIsActive(video) && video.hasAttribute("data-autoplay") &&
+            !motionPaused && !document.hidden && !manuallyPaused.has(video)) {
+          playVideo(video);
+        } else {
+          video.pause();
+          reflectVideo(video);
+        }
+      });
+      deck.querySelectorAll("img[data-animated-src]").forEach((image) => {
+        const running = activeSlide().contains(image) && !motionPaused && !document.hidden && !image.closest('.has-live-motion');
+        const source = running ? image.dataset.animatedSrc : image.dataset.stillSrc;
+        if (source && image.getAttribute("src") !== source) image.src = source;
+        image.dataset.motionState = running ? "playing" : "paused";
+      });
+    }
+
+    function setMotion(paused, userChoice = true) {
+      motionPaused = paused;
+      if (userChoice) motionChosen = true;
+      deck.classList.toggle("motion-paused", paused);
+      deck.classList.toggle("motion-enabled", !paused);
+      if (controls.motion) {
+        controls.motion.setAttribute("aria-pressed", String(paused));
+        controls.motion.setAttribute("aria-label", paused ? "Resume motion (P)" : "Pause motion (P)");
+        controls.motion.title = paused ? "Resume motion (P)" : "Pause motion (P)";
+        controls.motion.dataset.state = paused ? "paused" : "playing";
+        controls.motion.textContent = paused ? "▶" : "Ⅱ";
+      }
+      syncMedia();
+    }
+
+    function buildTrialGrid() {
+      const grid = $("trial-grid");
+      if (!grid || !Array.isArray(window.PITCH_TRIALS)) return;
+      grid.replaceChildren();
+      window.PITCH_TRIALS.forEach((item, index) => {
+        const figure = document.createElement("figure");
+        figure.className = "trial-card";
+        figure.dataset.index = String(index + 1);
+        const isVideo = item.type === "video" || /\.(mp4|webm|mov)(?:[?#]|$)/i.test(item.src || "");
+        const media = document.createElement(isVideo ? "video" : "img");
+        if (item.src && (isVideo || !item.poster)) media.src = item.src;
+        if (isVideo) {
+          media.muted = true;
+          media.loop = true;
+          media.playsInline = true;
+          media.preload = "none";
+          media.dataset.autoplay = "";
+          media.setAttribute("aria-label", item.alt || item.label || `Trial setup ${index + 1}`);
+          if (item.poster) media.poster = item.poster;
+        } else {
+          if (item.poster && /\.(gif|webp)(?:[?#]|$)/i.test(item.src || "")) {
+            media.src = item.poster;
+            media.dataset.animatedSrc = item.src;
+            media.dataset.stillSrc = item.poster;
+          }
+          media.alt = item.alt || item.label || `Trial setup ${index + 1}`;
+          media.decoding = "async";
+          media.loading = "lazy";
+          media.width = 640;
+          media.height = 360;
+        }
+        figure.append(media);
+        if (item.label) {
+          const caption = document.createElement("figcaption");
+          caption.textContent = item.label;
+          figure.append(caption);
+        }
+        grid.append(figure);
+      });
+    }
+
+    function hydrateMedia() {
+      const sources = window.PITCH_MEDIA || {};
+      deck.querySelectorAll("video[data-media]").forEach((video) => {
+        const source = sources[video.dataset.media];
+        if (!source) return;
+        if (source.src) video.src = source.src;
+        if (source.poster) video.poster = source.poster;
+        if (source.sourceUrl) video.dataset.sourceUrl = source.sourceUrl;
+        if (source.title) video.setAttribute("aria-label", source.title);
+        if (!source.src) mediaStatus(video, "Open the source to watch this demo.", true);
+      });
+      deck.querySelectorAll("video").forEach((video, index) => {
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.preload = "none";
+        video.defaultPlaybackRate = Number(video.dataset.playbackRate) || 1;
+        video.playbackRate = video.defaultPlaybackRate;
+        if (!video.id) video.id = `pitch-video-${index + 1}`;
+        const frame = video.closest(".media-frame");
+        let button = videoButton(video);
+        // The trial wall stays visually quiet; its clips follow the motion control.
+        if (!button && frame) {
+          button = document.createElement("button");
+          button.type = "button";
+          button.className = "media-play";
+          button.dataset.generated = "true";
+          frame.append(button);
+        }
+        if (button) {
+          button.setAttribute("aria-controls", video.id);
+          button.addEventListener("click", () => {
+            if (video.paused || video.ended) {
+              manuallyPaused.delete(video);
+              if (motionPaused) setMotion(false);
+              playVideo(video);
+            } else {
+              manuallyPaused.add(video);
+              video.pause();
+            }
+            reflectVideo(video);
+          });
+        }
+        video.addEventListener("play", () => reflectVideo(video));
+        video.addEventListener("pause", () => reflectVideo(video));
+        video.addEventListener("error", () => mediaStatus(video, "Video unavailable.", true));
+        video.addEventListener("loadeddata", () => mediaStatus(video, ""));
+        reflectVideo(video);
+      });
+    }
+
+    function updateNotes() {
+      const content = $("notes-content");
+      if (!content) return;
+      const template = activeSlide().querySelector("template.notes");
+      if (template) content.replaceChildren(template.content.cloneNode(true));
+      else content.textContent = "No presenter notes for this slide.";
+    }
+
+    function closePanel(restoreFocus = true) {
+      if (!openPanel) return;
+      if (typeof openPanel.close === "function" && openPanel.open) openPanel.close();
+      openPanel.hidden = true;
+      openPanel.setAttribute("aria-hidden", "true");
+      controls.notes?.setAttribute("aria-expanded", "false");
+      controls.overview?.setAttribute("aria-expanded", "false");
+      openPanel = null;
+      if (viewport) viewport.inert = false;
+      if (restoreFocus && returnFocus?.isConnected && !returnFocus.closest("[inert]")) returnFocus.focus();
+      returnFocus = null;
+    }
+
+    function togglePanel(panel, trigger) {
+      if (!panel) return;
+      if (openPanel === panel) { closePanel(); return; }
+      closePanel(false);
+      returnFocus = trigger || document.activeElement;
+      openPanel = panel;
+      if (viewport) viewport.inert = true;
+      updateNotes();
+      panel.hidden = false;
+      panel.setAttribute("aria-hidden", "false");
+      if (panel.tagName === "DIALOG" && typeof panel.showModal === "function") panel.showModal();
+      trigger?.setAttribute("aria-expanded", "true");
+      const focusTarget = panel.querySelector("[autofocus], button, a[href], [tabindex='0']");
+      if (focusTarget) focusTarget.focus();
+    }
+
+    function goTo(index, writeHash = true) {
+      const next = Math.max(0, Math.min(slides.length - 1, index));
+      const oldSlide = activeSlide();
+      const focusWasInSlide = oldSlide.contains(document.activeElement);
+      current = next;
+      slides.forEach((slide, position) => {
+        const active = position === current;
+        slide.classList.toggle("is-active", active);
+        slide.setAttribute("aria-hidden", String(!active));
+        slide.inert = !active;
+      });
+      deck.classList.toggle("light-slide", activeSlide().classList.contains("solution-slide"));
+      if ($("current-slide")) $("current-slide").textContent = String(current + 1).padStart(2, "0");
+      if ($("total-slides")) $("total-slides").textContent = String(slides.length).padStart(2, "0");
+      if ($("progress-fill")) $("progress-fill").style.width = `${(current + 1) / slides.length * 100}%`;
+      if (controls.previous) controls.previous.disabled = current === 0;
+      if (controls.next) controls.next.disabled = current === slides.length - 1;
+      $("overview-list")?.querySelectorAll("button").forEach((button, position) => {
+        button.classList.toggle("is-current", position === current);
+        if (position === current) button.setAttribute("aria-current", "step");
+        else button.removeAttribute("aria-current");
+      });
+      if (writeHash) {
+        try { history.replaceState(null, "", `#${current + 1}`); }
+        catch (_) { window.location.hash = String(current + 1); }
+      }
+      const title = activeSlide().dataset.title || `Slide ${current + 1}`;
+      document.title = `${title} — ${baseTitle}`;
+      updateNotes();
+      syncMedia();
+      if (focusWasInSlide && oldSlide !== activeSlide()) {
+        activeSlide().tabIndex = -1;
+        activeSlide().focus({ preventScroll: true });
+      }
+      announce(`Slide ${current + 1} of ${slides.length}. ${title}`);
+    }
+
+    function readHash() {
+      const match = window.location.hash.match(/^#(?:slide-)?(\d+)$/);
+      return match ? Math.min(slides.length - 1, Math.max(0, Number(match[1]) - 1)) : 0;
+    }
+
+    function buildOverview() {
+      const list = $("overview-list");
+      if (!list) return;
+      list.replaceChildren();
+      slides.forEach((slide, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "overview-item";
+        const number = document.createElement("span");
+        number.className = "overview-number";
+        number.textContent = String(index + 1).padStart(2, "0");
+        const title = document.createElement("span");
+        title.className = "overview-title";
+        title.textContent = slide.dataset.title || `Slide ${index + 1}`;
+        button.append(number, title);
+        button.addEventListener("click", () => { closePanel(); goTo(index); });
+        list.append(button);
+      });
+    }
+
+    async function fullscreen() {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+        else announce("Fullscreen is unavailable in this browser. Use the browser's fullscreen command.");
+      } catch (_) { announce("Could not enter fullscreen. Use the browser's fullscreen command."); }
+    }
+
+    controls.previous?.addEventListener("click", () => goTo(current - 1));
+    controls.next?.addEventListener("click", () => goTo(current + 1));
+    controls.fullscreen?.addEventListener("click", fullscreen);
+    controls.notes?.addEventListener("click", () => togglePanel(notesPanel, controls.notes));
+    controls.overview?.addEventListener("click", () => togglePanel(overview, controls.overview));
+    controls.motion?.addEventListener("click", () => setMotion(!motionPaused));
+    $("close-notes")?.addEventListener("click", () => closePanel());
+    $("close-overview")?.addEventListener("click", () => closePanel());
+    [notesPanel, overview].filter(Boolean).forEach((panel) => {
+      panel.addEventListener("cancel", (event) => { event.preventDefault(); closePanel(); });
+      panel.addEventListener("click", (event) => {
+        if (panel.tagName !== "DIALOG" || event.target !== panel) return;
+        const rect = panel.getBoundingClientRect();
+        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closePanel();
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && openPanel) { event.preventDefault(); closePanel(); return; }
+      if (event.ctrlKey || event.metaKey || event.altKey || event.defaultPrevented) return;
+      if (openPanel) {
+        if (event.key === "Tab") {
+          const items = Array.from(openPanel.querySelectorAll("button:not([disabled]), a[href], input, select, textarea, [tabindex='0']"))
+            .filter((element) => !element.hidden && element.getClientRects().length);
+          if (items.length) {
+            const first = items[0];
+            const last = items[items.length - 1];
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+          }
+        }
+        if (event.key.toLowerCase() === "n" && openPanel === notesPanel) { event.preventDefault(); closePanel(); }
+        if (event.key.toLowerCase() === "o" && openPanel === overview) { event.preventDefault(); closePanel(); }
+        return;
+      }
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest("input, textarea, select, video, [contenteditable='true']")) return;
+      const key = event.key.toLowerCase();
+      if ((key === " " || key === "enter") && target?.closest("button, a[href], summary")) return;
+      if (["arrowright", "arrowdown", "pagedown", " "].includes(key)) { event.preventDefault(); goTo(current + 1); }
+      else if (["arrowleft", "arrowup", "pageup"].includes(key)) { event.preventDefault(); goTo(current - 1); }
+      else if (key === "home") { event.preventDefault(); goTo(0); }
+      else if (key === "end") { event.preventDefault(); goTo(slides.length - 1); }
+      else if (key === "f") { event.preventDefault(); fullscreen(); }
+      else if (key === "n") { event.preventDefault(); togglePanel(notesPanel, controls.notes); }
+      else if (key === "o") { event.preventDefault(); togglePanel(overview, controls.overview); }
+      else if (key === "p") { event.preventDefault(); setMotion(!motionPaused); }
+    });
+
+    deck.addEventListener("pointerdown", (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (openPanel || event.pointerType === "mouse" || target?.closest("video, button, a, input, [role='button']")) return;
+      touchStart = { x: event.clientX, y: event.clientY, id: event.pointerId };
+    });
+    deck.addEventListener("pointerup", (event) => {
+      if (!touchStart || touchStart.id !== event.pointerId) return;
+      const dx = event.clientX - touchStart.x;
+      const dy = event.clientY - touchStart.y;
+      touchStart = null;
+      if (Math.abs(dx) >= 60 && Math.abs(dx) > Math.abs(dy) * 1.5) goTo(current + (dx < 0 ? 1 : -1));
+    });
+    deck.addEventListener("pointercancel", () => { touchStart = null; });
+    window.addEventListener("hashchange", () => goTo(readHash(), false));
+    window.addEventListener("resize", () => { if (!resizeFrame) resizeFrame = requestAnimationFrame(fit); });
+    document.addEventListener("visibilitychange", syncMedia);
+    document.addEventListener("fullscreenchange", () => {
+      controls.fullscreen?.setAttribute("aria-pressed", String(Boolean(document.fullscreenElement)));
+      controls.fullscreen?.setAttribute("aria-label", document.fullscreenElement ? "Exit fullscreen (F)" : "Fullscreen (F)");
+      fit();
+    });
+    reducedMotion.addEventListener("change", (event) => { if (!motionChosen) setMotion(event.matches, false); });
+
+    const matrix = $("compression-matrix");
+    if (matrix) {
+      for (let row = 0; row < 10; row += 1) {
+        for (let column = 0; column < 10; column += 1) {
+          const node = document.createElement("i");
+          node.className = "matrix-node";
+          node.style.setProperty("--row", row);
+          node.style.setProperty("--col", column);
+          node.style.setProperty("--delay", `${(row + column) * 0.025}s`);
+          matrix.append(node);
+        }
+      }
+    }
+    buildTrialGrid();
+    hydrateMedia();
+    buildOverview();
+    fit();
+    setMotion(motionPaused, false);
+    goTo(readHash());
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
+  else init();
+})();

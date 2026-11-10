@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#08090c">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Superfast Robotics — Super Tiny Robot Brain</title>
+  <meta name="description" content="Superfast Robotics investor presentation. Compressing robot intelligence for onboard deployment.">
+  <link rel="icon" href="favicon.png">
+  <link rel="stylesheet" href="pitch.css">
+  <link rel="stylesheet" href="motion.css">
+  <link rel="stylesheet" href="typography.css">
+  <link rel="stylesheet" href="motion-enhanced.css">
+  <link rel="stylesheet" href="motion-chip.css">
+  <link rel="stylesheet" href="motion-compression.css">
+  <link rel="stylesheet" href="motion-lattice.css">
+  <link rel="stylesheet" href="motion-deployment.css">
+  <link rel="stylesheet" href="motion-binary-chip.css">
+  <link rel="stylesheet" href="systems-expansion.css">
+  <link rel="stylesheet" href="cover-orbit.css">
+  <link rel="stylesheet" href="team-slide.css">
+  <link rel="stylesheet" href="ask-slide.css">
+  <link rel="stylesheet" href="evidence-annotation.css">
+  <script src="media.js" defer></script>
+  <script src="pitch.js" defer></script>
+  <script src="assets/vendor/three-r160.min.js" defer></script>
+  <script src="motion-runtime.js" defer></script>
+  <script src="motion-chip.js" defer></script>
+  <script src="motion-compression.js" defer></script>
+  <script src="motion-lattice.js" defer></script>
+  <script src="motion-deployment.js" defer></script>
+  <script src="motion-binary-chip.js" defer></script>
+  <script src="motion-enhanced.js" defer></script>
+  <script src="cover-orbit.js" defer></script>
+  <script src="team-orbits.js" defer></script>
+</head>
+<body>
+  <main id="viewport" aria-label="Superfast Robotics pitch presentation">
+    <div id="deck">
+      <header class="deck-header">
+        <a href="#1" class="brand" aria-label="Superfast Robotics, first slide"><img src="assets/shared/wordmark.png" alt="Superfast Robotics" width="1182" height="159"></a>
+      </header>
+
+      <section class="slide cover is-active" id="slide-1" data-title="Super Tiny Robot Brain" aria-label="Slide 1">
+        <div class="ambient cover-film"><video data-media="hero" data-playback-rate="1" data-autoplay muted loop playsinline preload="metadata" poster="assets/rollout-reel-poster.jpg"></video></div>
+        <div class="cover-shade"></div>
+        <canvas class="cover-orbit cover-orbit-back" width="960" height="650" aria-hidden="true"></canvas>
+        <div class="cover-copy"><h1>Super <em>Tiny</em><br>Robot Brain</h1><p>Intelligence that fits inside the robot.</p></div>
+        <canvas class="cover-orbit cover-orbit-front" width="960" height="650" aria-hidden="true"></canvas>
+        <div class="film-caption"><span class="live-dot"></span> 18 ROLLOUTS / 6× PLAYBACK</div>
+        <template class="notes"><h2>Super Tiny Robot Brain</h2><p>Robot intelligence is improving rapidly. We make it small enough to run inside real robots.</p><p>18 edited evaluation rollouts, alternating between the kitchen, meeting room and warehouse. The silent reel includes each complete edited rollout at 6× speed. All inference ran on Jetson Orin NX 16 GB.</p><p><a href="https://superfastrobotics.com/writings/demo-001.html" target="_blank" rel="noopener">Demo 001: model, setup and results</a></p></template>
+      </section>
+
+      <section class="slide progress-slide" id="slide-2" data-title="Robot brains are getting better" aria-label="Slide 2" aria-hidden="true" inert>
+        <h2 class="slide-title">Robot brains are getting better</h2>
+        <div class="industry-films">
+          <figure><figcaption><strong>Dream-1</strong><span>Dream Labs</span></figcaption><div class="media-frame"><video data-media="dream" data-autoplay muted loop playsinline preload="none"></video><button class="media-play" type="button" aria-label="Play or pause Dream-1 video">Ⅱ</button><p class="media-status" data-media-status hidden></p></div></figure>
+          <figure><figcaption><strong>GR00T 2</strong><span>NVIDIA</span></figcaption><div class="media-frame"><video data-media="groot" data-autoplay muted loop playsinline preload="none"></video><button class="media-play" type="button" aria-label="Play or pause GR00T 2 video">Ⅱ</button><p class="media-status" data-media-status hidden></p></div></figure>
+        </div>
+        <p class="bottom-line">The next challenge is deployment.</p>
+        <template class="notes"><h2>Robot brains are getting better</h2><p>Dream-1: dress folding, can restocking, and fruit pouring. GR00T 2: microscope work, shipping labels, and GR00T 2 Turbo popcorn delivery. Each silent reel contains three 11-second excerpts. Dream-1 footage retains the original research team's encoded 4× speed; no additional speedup is applied.</p><p><a href="https://dreamlabs.ai/research/dream-1/" target="_blank" rel="noopener">Dream Labs: Dream-1</a><br><a href="https://research.nvidia.com/labs/gear/gr00t-2/" target="_blank" rel="noopener">NVIDIA: GR00T 2</a></p><p>Official demonstration clips are included locally for presentation. These are the respective research teams' demonstrations.</p></template>
+      </section>
+
+      <section class="slide deployment-slide" id="slide-3" data-title="Two ways to deploy. Two problems." aria-label="Slide 3" aria-hidden="true" inert>
+        <h2 class="slide-title">Two ways to deploy.<br><span class="muted">Two problems.</span></h2>
+        <div class="deployment-lines" aria-label="Cloud deployment depends on the network. Thor onboard deployment carries hardware and power costs.">
+          <div class="deployment-row"><div class="route-origin"><span class="eyebrow">01 / CLOUD</span><strong>Remote brain</strong></div><div class="connection"><span>NETWORK</span><i></i></div><div class="route-end"><strong>Robot</strong><span class="problem">Connection risk</span></div></div>
+          <div class="deployment-row"><div class="route-origin"><span class="eyebrow">02 / ON BOARD</span><strong>Jetson Thor</strong></div><div class="connection"><span>LOCAL COMPUTE</span><i></i></div><div class="route-end"><strong>Robot</strong><span class="problem">Cost + power</span></div></div>
+        </div>
+        <div class="deployment-animation" role="img" aria-label="Concept animation of distributed compute connecting to onboard intelligence"><div class="deployment-fallback" aria-hidden="true"><i></i><i></i><i></i><b></b></div></div>
+        <p class="bottom-line small">Both become harder at fleet scale.</p>
+        <template class="notes"><h2>Deployment is the bottleneck</h2><p>Cloud deployment is shown above, with onboard Thor below. Both robot manufacturers and deployers face cost and utilization constraints.</p><p>These are two common deployment choices, not an exhaustive taxonomy. Cloud systems can have local safeguards; the point is that useful onboard fallback needs enough local intelligence.</p></template>
+      </section>
+
+      <section class="slide success-slide" id="slide-4" data-title="99.997% task success" aria-label="Slide 4" aria-hidden="true" inert>
+        <p class="success-label">Required task success rate</p>
+        <h2 class="success-number">99.997<span>%</span></h2>
+        <p class="success-copy">A dropped connection<br><em>can’t mean a failed task.</em></p>
+        <figure class="factory-film"><div class="media-frame"><video data-media="factory" data-autoplay muted loop playsinline preload="none"></video><button class="media-play" type="button" aria-label="Play or pause Figure at BMW manufacturing footage">Ⅱ</button><p class="media-status" data-media-status hidden></p></div><figcaption>Figure 03 at BMW Plant Spartanburg<span>Source: Figure</span></figcaption></figure>
+        <div class="network-event"><span class="offline-dot"></span> NETWORK OFFLINE<span class="event-divider"></span><span class="live-dot"></span> LOCAL FALLBACK</div>
+        <template class="notes"><h2>Task success requires a local fallback</h2><p>Deployment requirement: 99.997% task success. The manufacturing footage shows Figure 03 at BMW Plant Spartanburg. The network indicator illustrates local fallback.</p><p><a href="https://www.figure.ai/news/f-03-at-bmw" target="_blank" rel="noopener">Figure: F.03 Arrives at BMW</a></p></template>
+      </section>
+
+      <section class="slide economics-slide" id="slide-5" data-title="The onboard trade-off" aria-label="Slide 5" aria-hidden="true" inert>
+        <div class="ambient economics-film"><video data-media="robot" data-autoplay muted loop playsinline preload="none"></video></div>
+        <h2 class="slide-title">The onboard trade-off</h2>
+        <div class="thor-price"><strong>$5,000</strong><span>Thor T5000 compute module*</span></div>
+        <div class="duty-cycle"><p><strong>3h</strong> work <span>/</span> <strong>1h</strong> rest</p><div class="cycle-chart" role="img" aria-label="Illustrative duty cycle: three hours working and one hour resting"><i></i><i></i><i></i><i class="rest"></i></div><span>Operating scenario</span></div>
+        <p class="economics-takeaway">Downtime eats ROI.</p>
+        <p class="qualifier">*NVIDIA module MSRP: $4,999 at 1,000+ units. Duty cycle depends on the robot and workload.</p>
+        <template class="notes"><h2>Cost and duty cycle</h2><p>NVIDIA lists Jetson T5000 at $4,999 (1KU+ volume MSRP). Prices compare compute modules. Illustrative work fraction: 3 / (3 + 1) = 75%.</p><p><a href="https://developer.nvidia.com/embedded/faq" target="_blank" rel="noopener">NVIDIA Jetson FAQ: module pricing</a></p></template>
+      </section>
+
+      <section class="slide solution-slide" id="slide-6" data-title="$1,000 compute. Continuous work." aria-label="Slide 6" aria-hidden="true" inert>
+        <div class="solution-copy"><p class="eyebrow">OUR GOAL</p><h2>$1,000</h2><p class="price-caption">Orin NX 16 GB compute module*</p><p class="solution-title">Built to keep<br>working.</p><p class="solution-detail">Intelligence, fully on board.</p></div>
+        <div class="onboard-animation" role="img" aria-label="Concept animation: a small onboard chip continuously processes signals">
+          <p class="chip-overline">LOCAL INFERENCE</p>
+          <div class="chip-scene"><div class="chip-shadow"></div><div class="chip-assembly"><div class="circuit-board"><div class="circuit-trace trace-1"></div><div class="circuit-trace trace-2"></div><div class="circuit-trace trace-3"></div><div class="circuit-trace trace-4"></div><div class="circuit-loop loop-1"></div><div class="circuit-loop loop-2"></div><div class="circuit-loop loop-3"></div><div class="chip-package"><div class="chip-pins pins-horizontal"></div><div class="chip-pins pins-vertical"></div><div class="chip-edge"></div><div class="chip-core"><img src="assets/shared/wordmark.png" alt=""><span>ON BOARD</span><i class="core-scan"></i></div></div></div></div></div>
+          <div class="inference-pulse"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <p class="chip-caption">Small compute. Continuous inference.</p>
+        </div>
+        <p class="qualifier">*Module MSRP: $999 at 1,000+ units. Continuous operation is the design goal.</p>
+        <template class="notes"><h2>Smaller compute, more useful work</h2><p>We have already run onboard inference on Jetson Orin NX 16 GB. Our goal is continuous robot operation with roughly $1,000 of compute.</p><p>NVIDIA's Orin NX 16 GB module MSRP is $999 at 1KU+ volume. The price excludes the carrier board, cooling, storage, robot and integration. Continuous work is a design goal; the current demo is not an endurance or battery-life validation. The chip animation is a conceptual illustration of onboard inference, not a rendering of NVIDIA hardware.</p><p><a href="https://developer.nvidia.com/embedded/faq" target="_blank" rel="noopener">NVIDIA module pricing</a><br><a href="https://superfastrobotics.com/writings/demo-001.html" target="_blank" rel="noopener">Our Orin NX experiment</a></p></template>
+      </section>
+
+      <section class="slide origin-slide" id="slide-7" data-title="100× smaller. Built at Samsung Research." aria-label="Slide 7" aria-hidden="true" inert>
+        <p class="eyebrow section-kicker">MODEL COMPRESSION · LittleBit (NeurIPS ’25 · ICML ’26)</p>
+        <div class="origin-main"><h2>100<span>×</span></h2><p>smaller language models</p></div>
+        <div class="compression-animation" role="img" aria-label="Animated illustration of a model compressing from 1 gigabyte to about 10 megabytes"><div class="compression-rail"></div><div id="compression-matrix" aria-hidden="true"></div><div class="compressed-halo"></div><div class="compression-labels"><span>1 GB</span><span>~10 MB</span></div></div>
+        <div class="origin-history"><div><span class="eyebrow">DEVELOPED AT</span><strong>Samsung Research</strong><p class="origin-github"><a href="https://github.com/SamsungLabs/LittleBit" target="_blank" rel="noopener">#1 by GitHub stars at SamsungLabs</a></p></div><div><span class="eyebrow">GALAXY DEPLOYMENT PIPELINE</span><strong>200M <span>devices per year</span></strong></div></div>
+        <template class="notes"><h2>Compression developed at Samsung Research</h2><p>The speculative-decoding draft model was compressed by roughly 100×, retaining about 60–80% of the original draft's acceptance length. 1 GB to 10 MB illustrates the size reduction. Galaxy deployment pipeline: 200M devices per year.</p><p>LittleBit ranks first by GitHub stars among the SamsungLabs organization's 108 public repositories: 305 stars as of November 10, 2026. The comparison is scoped to SamsungLabs.</p><p><a href="https://superfastrobotics.com/writings/essay-001.html#on-device" target="_blank" rel="noopener">The Little Beginning: on-device models</a><br><a href="https://proceedings.nips.cc/paper_files/paper/2025/hash/a917c1d57088897beba47f96b4fd7f3c-Abstract-Conference.html" target="_blank" rel="noopener">LittleBit · NeurIPS 2025</a><br><a href="https://proceedings.mlr.press/v306/lee26y.html" target="_blank" rel="noopener">LittleBit-2 · ICML 2026</a><br><a href="https://github.com/orgs/SamsungLabs/repositories?type=all&amp;sort=stargazers&amp;direction=desc" target="_blank" rel="noopener">SamsungLabs repositories by stars</a></p></template>
+      </section>
+
+      <section class="slide benchmark-slide" id="slide-8" data-title="2× faster" aria-label="Slide 8" aria-hidden="true" inert>
+        <div class="benchmark-head"><p class="eyebrow">LittleBit + Speculative Decoding</p><h2>2<span>×</span> <em>faster</em></h2></div>
+        <div class="benchmark-animation"><img src="assets/compression-3d-poster.png" data-animated-src="assets/compression-3d.gif" data-still-src="assets/compression-3d-poster.png" alt="Looping 3D concept animation of a large lattice compressing into a compact core" width="560" height="360"></div>
+        <div class="benchmark-logos">
+          <div class="benchmark-column"><div class="company-logo"><img src="assets/google-logo.png" alt="Google"></div><span class="benchmark-model">Gemma 4 E2B MTP</span><strong>&gt;2× faster</strong></div>
+          <div class="benchmark-column"><div class="company-logo logo-liquid"><img src="assets/liquid-logo.svg" alt="Liquid AI"></div><span class="benchmark-model">DSpark</span><strong>~2× faster</strong><span class="comparison-note">At most ¼ the size</span></div>
+          <div class="benchmark-column"><div class="company-logo logo-qualcomm"><img src="assets/qualcomm-logo.svg" alt="Qualcomm"></div><span class="benchmark-model">Eaglet</span><strong>&gt;3× faster</strong></div>
+        </div>
+        <template class="notes"><h2>LittleBit for speculative decoding</h2><p>LittleBit applied to speculative decoding. Speed comparisons: &gt;2× versus Google Gemma 4 E2B MTP, ~2× versus Liquid DSpark, and &gt;3× versus Qualcomm Eaglet. The model is at most one-quarter the size of Liquid DSpark. The 3D animation illustrates model compression.</p><p><a href="https://superfastrobotics.com/writings/essay-001.html#on-device" target="_blank" rel="noopener">Model compression and comparisons</a><br><a href="https://docs.qualcomm.com/nav/home/index_Genie.html?product=924033590759186372" target="_blank" rel="noopener">Qualcomm Genie documentation: Eaglet</a></p></template>
+      </section>
+
+      <section class="slide evidence-slide" id="slide-9" data-title="160× compressed. Still working." aria-label="Slide 9" aria-hidden="true" inert>
+        <div class="evidence-copy"><p class="eyebrow">LittleBit + World Action Model</p><h2><span class="evidence-metric">160<span>×</span></span><br><em>compressed.</em><br>Still working.</h2><p>UnifoLM-WLA-1.0<br>Jetson Orin NX · All inference on board</p><span class="evidence-definition">LM backbone weight representation vs. FP16</span></div>
+        <div class="evidence-note" role="note" aria-label="We have an early signal.">
+          <svg class="evidence-note-lines" viewBox="0 0 1600 900" fill="none" aria-hidden="true">
+            <path class="note-ink note-arrow" pathLength="100" d="M1073 285 C1041 263 1041 225 1070 218 C1109 209 1135 252 1112 262 C1094 270 1090 248 1108 228 C1120 211 1144 198 1174 194"/>
+            <path class="note-ink note-arrowhead" pathLength="100" d="M1168 182 L1176 194 L1161 204"/>
+            <path class="note-ink note-bubble" pathLength="100" d="M1190 126 C1262 110 1438 111 1508 128 C1534 137 1539 207 1516 224 C1465 245 1282 245 1211 230 L1177 250 L1188 222 C1164 207 1162 146 1190 126 Z"/>
+          </svg>
+          <p class="evidence-signal" aria-hidden="true">We have an<br><em>early signal.</em></p>
+        </div>
+        <div class="evidence-video media-frame"><video data-media="demo" data-playback-rate="4" data-autoplay muted loop playsinline preload="none"></video><button class="media-play" type="button" aria-label="Play or pause our robot demonstration">Ⅱ</button><p class="media-status" data-media-status hidden></p></div><p class="evidence-playback">4× playback speed</p>
+        <template class="notes"><h2>Compression transfers to robot intelligence</h2><p>The language-model backbone in Unitree's 6B UnifoLM-WLA-1.0 uses a weight representation roughly 160 times smaller than FP16. This is not a 160-fold reduction in total model memory or processing time.</p><p>All inference ran onboard Jetson Orin NX 16 GB. Compression training used FruitCollection and QAKD. This was an early checkpoint with less than 10% of planned training completed. The presentation plays this footage at 4× speed; the original video’s burned-in 1× label refers to its source recording.</p><p><a href="https://superfastrobotics.com/writings/demo-001.html#setup" target="_blank" rel="noopener">Experiment details</a><br><a href="https://github.com/unitreerobotics/unifolm-wla" target="_blank" rel="noopener">Unitree UnifoLM-WLA</a></p></template>
+      </section>
+
+      <section class="slide trials-slide" id="slide-10" data-title="60 successful trials out of 90" aria-label="Slide 10" aria-hidden="true" inert>
+        <div class="trials-heading"><h2>60<span>/90</span></h2><div><p>Successful real-world trials</p><span>Zero-shot in new environments</span></div></div>
+        <div id="trial-grid" class="trial-grid" aria-label="18 evaluation setups across three locations, three fruits and two baskets"></div>
+        <div class="trial-summary"><span>3 locations</span><span>3 fruits</span><span>2 baskets</span><span>Early checkpoint: &lt;10% of planned training</span></div>
+        <p class="qualifier">Rollouts at 4×. 60/90 = 66.7%. One-minute trials with retries. The task was seen in training; evaluation setups were new.</p>
+        <template class="notes"><h2>60 successes in 90 trials</h2><p>These early results come from a checkpoint with less than 10% of the planned training completed.</p><p>Protocol: 3 locations × 3 fruit types × 2 basket shapes × 5 trials. Each trial lasted one minute and allowed autonomous retries. 60 successes / 90 trials = 66.7%.</p><p>Zero-shot refers to new evaluation environments and layouts, without additional training for those setups. Fruit moving was represented in FruitCollection during compression training. This does not establish zero-shot generalization to an unseen task.</p><p><a href="https://superfastrobotics.com/writings/demo-001.html#results" target="_blank" rel="noopener">Trial results and protocol</a></p></template>
+      </section>
+
+      <section class="slide systems-slide" id="slide-11" data-title="The whole brain. One small chip." aria-label="Slide 11" aria-hidden="true" inert>
+        <p class="eyebrow section-kicker">OUR GOAL</p>
+        <h2 class="systems-title">The whole brain.<br><em>One small chip.</em></h2>
+        <div class="systems-stack"><div><span>System 2</span><strong>VLM</strong></div><div><span>System 1</span><strong>VLA · WAM</strong></div><div><span>System 0</span><strong>Control</strong></div></div>
+        <div class="system-bus" aria-hidden="true"></div><div class="orin-target"><span>ALL ON BOARD</span><strong>Jetson<br>Orin NX</strong><i></i></div>
+        <div class="binary-chip-animation" role="img" aria-label="Concept animation of a binary inference chip"><div class="binary-chip-fallback" aria-hidden="true"><i></i><b>01</b></div></div>
+        <div class="chip-roadmap-link" aria-hidden="true"><i></i><b></b></div>
+        <div class="binary-target"><span class="eyebrow">NEXT</span><strong>Super-Efficient<br>Binary Inference<br>Chip</strong></div>
+        <template class="notes"><h2>From Orin NX to binary inference</h2><p>Intended architecture: System 2 uses VLM, System 1 uses VLA and WAM, and System 0 handles control. Hardware direction: Jetson Orin NX, then a super-efficient binary inference chip.</p><p><a href="https://superfastrobotics.com/writings/demo-001.html#next" target="_blank" rel="noopener">Onboard inference development</a></p></template>
+      </section>
+
+      <section class="slide team-slide" id="slide-12" data-title="Team" aria-label="Slide 12" aria-hidden="true" inert>
+        <p class="eyebrow team-kicker">TEAM</p>
+        <h2 class="team-heading motion-reveal">Four researchers who worked<br>together at <em>Samsung Research</em></h2>
+        <div class="team-members">
+          <article class="team-member motion-reveal" style="--enter-delay:.08s">
+            <div class="team-portrait"><img src="assets/team/banseok-lee.jpg" width="333" height="333" alt="Banseok Lee"><canvas class="team-orbit" width="270" height="270" aria-hidden="true"></canvas></div>
+            <h3>Banseok Lee</h3><p class="team-role">CEO</p><p class="team-expertise">Inference Expert</p><p class="team-university">UCLA</p>
+          </article>
+          <article class="team-member motion-reveal" style="--enter-delay:.17s">
+            <div class="team-portrait"><img src="assets/team/r-loki.jpg" width="333" height="333" alt="Lohith Ravuru"><canvas class="team-orbit" width="270" height="270" aria-hidden="true"></canvas></div>
+            <h3>Lohith Ravuru</h3><p class="team-role">CTO</p><p class="team-expertise">Training Expert</p><p class="team-university">IIT Bombay - JEE Rank 4</p>
+          </article>
+          <article class="team-member motion-reveal" style="--enter-delay:.26s">
+            <div class="team-portrait"><img src="assets/team/ym-kim.jpg" width="333" height="333" alt="Youngmin Kim"><canvas class="team-orbit" width="270" height="270" aria-hidden="true"></canvas></div>
+            <h3>Youngmin Kim, PhD</h3><p class="team-role">CRO</p><p class="team-expertise">Humanoid Expert</p><p class="team-university">KAIST</p>
+          </article>
+          <article class="team-member motion-reveal" style="--enter-delay:.35s">
+            <div class="team-portrait"><img src="assets/team/jw-lee.jpg" width="333" height="333" alt="Jungwoo Lee"><canvas class="team-orbit" width="270" height="270" aria-hidden="true"></canvas></div>
+            <h3>Jungwoo Lee</h3><p class="team-role">CPO</p><p class="team-expertise">AI &amp; Robot Systems Expert</p><p class="team-university">Yonsei University</p>
+          </article>
+        </div>
+        <template class="notes"><h2>Team</h2><p>Four researchers who worked together at Samsung Research. Banseok Lee focuses on inference, Lohith Ravuru on training, Youngmin Kim, PhD on humanoids, and Jungwoo Lee on AI and robot systems.</p></template>
+      </section>
+
+      <section class="slide ask-slide" id="slide-13" data-title="The Ask" aria-label="Slide 13" aria-hidden="true" inert>
+        <h2 class="slide-title">The Ask</h2>
+        <p class="ask-raise" aria-label="Raising eight million US dollars"><span>$</span>8M</p>
+        <dl class="ask-allocation" aria-label="Use of funds">
+          <div><dt>GPU compute</dt><dd>$5M</dd></div>
+          <div><dt>Team</dt><dd>$2M</dd></div>
+          <div><dt>Hardware</dt><dd>$1M</dd></div>
+        </dl>
+        <div class="ask-allocation-meter" aria-hidden="true"><i></i><i></i><i></i></div>
+        <p class="ask-milestone-label">Milestones after funding</p>
+        <ol class="ask-timeline">
+          <li><h3 class="ask-month">6 <span>months</span></h3><p class="ask-target">Run GR00T 2.0 on<br>Jetson Orin NX</p><p class="ask-context">Frontier open-source robot model</p></li>
+          <li><h3 class="ask-month">12 <span>months</span></h3><p class="ask-target">First shipment to a<br>high-volume manufacturer</p><p class="ask-context ask-context-lg">Early discussions with LG</p></li>
+          <li><h3 class="ask-month">18 <span>months</span></h3><p class="ask-target">Add on-device<br>VLM reasoning</p></li>
+        </ol>
+        <template class="notes"><h2>The Ask</h2><p>We are raising $8M: $5M for GPU compute, $2M for the team and $1M for hardware.</p><p>Milestones after funding: run GR00T 2.0 on Jetson Orin NX within 6 months; make the first product shipment to a high-volume manufacturer within 12 months; add on-device VLM reasoning within 18 months. Early discussions with LG have begun.</p></template>
+      </section>
+
+      <section class="slide closing-slide" id="slide-14" data-title="Robot intelligence belongs on board" aria-label="Slide 14" aria-hidden="true" inert>
+        <div class="ambient closing-film"><video data-media="robot" data-autoplay muted loop playsinline preload="none"></video></div><div class="closing-shade"></div>
+        <canvas class="cover-orbit cover-orbit-back" width="1080" height="650" aria-hidden="true"></canvas>
+        <h2>Robot intelligence<br>belongs <em>on board.</em></h2>
+        <canvas class="cover-orbit cover-orbit-front" width="1080" height="650" aria-hidden="true"></canvas>
+        <a class="closing-contact" href="mailto:hello@superfastrobotics.com">hello@superfastrobotics.com <span aria-hidden="true">↗</span></a>
+        <a class="closing-site" href="https://superfastrobotics.com" target="_blank" rel="noopener">superfastrobotics.com</a>
+        <template class="notes"><h2>Superfast Robotics</h2><p>Superfast Robotics makes robot intelligence small enough for use in the real world.</p><p>Contact: hello@superfastrobotics.com</p></template>
+      </section>
+
+      <footer class="deck-controls" aria-label="Presentation controls">
+        <div class="control-tools"><button id="toggle-overview" type="button" title="Slide overview (O)" aria-label="Slide overview">▦</button><button id="toggle-notes" type="button" title="Speaker notes and sources (N)" aria-label="Speaker notes and sources">N</button><button id="toggle-motion" type="button" title="Pause or resume motion (P)" aria-label="Pause motion">Ⅱ</button><button id="fullscreen" type="button" title="Full screen (F)" aria-label="Full screen">⛶</button></div>
+        <span class="control-hint">← → to navigate</span>
+        <div class="control-pagination"><button id="prev-slide" type="button" aria-label="Previous slide">←</button><span><span id="current-slide">01</span><span class="page-slash">/</span><span id="total-slides">14</span></span><button id="next-slide" type="button" aria-label="Next slide">→</button></div>
+      </footer>
+      <div class="progress-track" aria-hidden="true"><div id="progress-fill"></div></div>
+    </div>
+  </main>
+  <aside id="notes-panel" role="dialog" aria-modal="true" aria-label="Speaker notes and sources" hidden><button id="close-notes" class="overlay-close" type="button" aria-label="Close speaker notes">×</button><div class="overlay-eyebrow">PRESENTER NOTES / SOURCES</div><div id="notes-content"></div></aside>
+  <div id="overview" role="dialog" aria-modal="true" aria-label="Slide overview" hidden><button id="close-overview" class="overlay-close" type="button" aria-label="Close slide overview">×</button><h2>Superfast Robotics</h2><div id="overview-list"></div></div>
+  <div id="status" class="sr-only" aria-live="polite"></div>
+  <noscript><p class="no-script">Enable JavaScript to navigate the presentation and play the videos.</p></noscript>
+</body>
+</html>
+
+
