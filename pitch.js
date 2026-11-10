@@ -12,10 +12,9 @@
     const $ = (id) => document.getElementById(id);
     const controls = {
       previous: $("prev-slide"), next: $("next-slide"),
-      fullscreen: $("fullscreen"), notes: $("toggle-notes"),
+      fullscreen: $("fullscreen"),
       overview: $("toggle-overview"), motion: $("toggle-motion"),
     };
-    const notesPanel = $("notes-panel");
     const overview = $("overview");
     const viewport = $("viewport");
     const navigation = deck.querySelector(".deck-controls");
@@ -362,20 +361,11 @@
       });
     }
 
-    function updateNotes() {
-      const content = $("notes-content");
-      if (!content) return;
-      const template = activeSlide().querySelector("template.notes");
-      if (template) content.replaceChildren(template.content.cloneNode(true));
-      else content.textContent = "No presenter notes for this slide.";
-    }
-
     function closePanel(restoreFocus = true) {
       if (!openPanel) return;
       if (typeof openPanel.close === "function" && openPanel.open) openPanel.close();
       openPanel.hidden = true;
       openPanel.setAttribute("aria-hidden", "true");
-      controls.notes?.setAttribute("aria-expanded", "false");
       controls.overview?.setAttribute("aria-expanded", "false");
       openPanel = null;
       if (viewport) viewport.inert = false;
@@ -390,7 +380,6 @@
       returnFocus = trigger || document.activeElement;
       openPanel = panel;
       if (viewport) viewport.inert = true;
-      updateNotes();
       panel.hidden = false;
       panel.setAttribute("aria-hidden", "false");
       if (panel.tagName === "DIALOG" && typeof panel.showModal === "function") panel.showModal();
@@ -427,7 +416,6 @@
       }
       const title = activeSlide().dataset.title || `Slide ${current + 1}`;
       document.title = `${title} — ${baseTitle}`;
-      updateNotes();
       syncMedia();
       if (focusWasInSlide && oldSlide !== activeSlide()) {
         activeSlide().tabIndex = -1;
@@ -472,12 +460,10 @@
     controls.previous?.addEventListener("click", () => goTo(current - 1));
     controls.next?.addEventListener("click", () => goTo(current + 1));
     controls.fullscreen?.addEventListener("click", fullscreen);
-    controls.notes?.addEventListener("click", () => togglePanel(notesPanel, controls.notes));
     controls.overview?.addEventListener("click", () => togglePanel(overview, controls.overview));
     controls.motion?.addEventListener("click", () => setMotion(!motionPaused));
-    $("close-notes")?.addEventListener("click", () => closePanel());
     $("close-overview")?.addEventListener("click", () => closePanel());
-    [notesPanel, overview].filter(Boolean).forEach((panel) => {
+    [overview].filter(Boolean).forEach((panel) => {
       panel.addEventListener("cancel", (event) => { event.preventDefault(); closePanel(); });
       panel.addEventListener("click", (event) => {
         if (panel.tagName !== "DIALOG" || event.target !== panel) return;
@@ -500,7 +486,6 @@
             else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
           }
         }
-        if (event.key.toLowerCase() === "n" && openPanel === notesPanel) { event.preventDefault(); closePanel(); }
         if (event.key.toLowerCase() === "o" && openPanel === overview) { event.preventDefault(); closePanel(); }
         return;
       }
@@ -513,7 +498,6 @@
       else if (key === "home") { event.preventDefault(); goTo(0); }
       else if (key === "end") { event.preventDefault(); goTo(slides.length - 1); }
       else if (key === "f") { event.preventDefault(); fullscreen(); }
-      else if (key === "n") { event.preventDefault(); togglePanel(notesPanel, controls.notes); }
       else if (key === "o") { event.preventDefault(); togglePanel(overview, controls.overview); }
       else if (key === "p") { event.preventDefault(); setMotion(!motionPaused); }
     });
