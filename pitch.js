@@ -19,11 +19,10 @@
     const overview = $("overview");
     const viewport = $("viewport");
     const status = $("status");
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const baseTitle = document.title;
     const manuallyPaused = new WeakSet();
-    let motionPaused = reducedMotion.matches;
-    let motionChosen = false;
+    // This presentation opens playing; Pause/P is the explicit opt-out.
+    let motionPaused = false;
     let current = 0;
     let openPanel = null;
     let returnFocus = null;
@@ -133,9 +132,8 @@
       });
     }
 
-    function setMotion(paused, userChoice = true) {
+    function setMotion(paused) {
       motionPaused = paused;
-      if (userChoice) motionChosen = true;
       deck.classList.toggle("motion-paused", paused);
       deck.classList.toggle("motion-enabled", !paused);
       if (controls.motion) {
@@ -417,7 +415,6 @@
       controls.fullscreen?.setAttribute("aria-label", document.fullscreenElement ? "Exit fullscreen (F)" : "Fullscreen (F)");
       fit();
     });
-    reducedMotion.addEventListener("change", (event) => { if (!motionChosen) setMotion(event.matches, false); });
 
     const matrix = $("compression-matrix");
     if (matrix) {
@@ -436,7 +433,7 @@
     hydrateMedia();
     buildOverview();
     fit();
-    setMotion(motionPaused, false);
+    setMotion(motionPaused);
     goTo(readHash());
   }
 

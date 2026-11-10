@@ -29,5 +29,5 @@
 .ask-slide.is-active .ask-milestone-label { animation-delay:.16s; }
 .ask-slide.is-active .ask-timeline { animation-delay:.22s; }
 #deck.motion-paused .ask-slide * { animation:none!important; }
-@media (prefers-reduced-motion:reduce) { .ask-slide * { animation:none!important; } }
+@media (prefers-reduced-motion:reduce) { #deck:not(.motion-enabled) .ask-slide * { animation:none!important; } }
 @media print { .ask-slide * { animation:none!important; } }
