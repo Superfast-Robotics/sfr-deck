@@ -18,6 +18,8 @@
     const notesPanel = $("notes-panel");
     const overview = $("overview");
     const viewport = $("viewport");
+    const navigation = deck.querySelector(".deck-controls");
+    const navigationAnchor = navigation?.nextSibling;
     const status = $("status");
     const baseTitle = document.title;
     const manuallyPaused = new WeakSet();
@@ -101,9 +103,16 @@
     }
 
     function fit() {
-      const scale = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+      const mobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth <= 700;
+      viewport.classList.toggle("touch-navigation", mobile);
+      // Keep touch targets in screen pixels instead of shrinking with the slide.
+      if (navigation && mobile && navigation.parentElement !== viewport) viewport.append(navigation);
+      else if (navigation && !mobile && navigation.parentElement !== deck) deck.insertBefore(navigation, navigationAnchor);
+      const navigationSpace = mobile && navigation ? navigation.offsetHeight + 24 : 0;
+      const scale = Math.min(window.innerWidth / 1600, Math.max(1, window.innerHeight - navigationSpace) / 900);
       document.documentElement.style.setProperty("--scale", String(scale));
       deck.style.setProperty("--scale", String(scale));
+      deck.style.top = mobile ? `calc(50% - ${navigationSpace / 2}px)` : "50%";
       resizeFrame = 0;
     }
 
@@ -509,19 +518,67 @@
       else if (key === "p") { event.preventDefault(); setMotion(!motionPaused); }
     });
 
-    deck.addEventListener("pointerdown", (event) => {
-      const target = event.target instanceof Element ? event.target : null;
-      if (openPanel || event.pointerType === "mouse" || target?.closest("video, button, a, input, [role='button']")) return;
-      touchStart = { x: event.clientX, y: event.clientY, id: event.pointerId };
-    });
-    deck.addEventListener("pointerup", (event) => {
-      if (!touchStart || touchStart.id !== event.pointerId) return;
-      const dx = event.clientX - touchStart.x;
-      const dy = event.clientY - touchStart.y;
+    function beginSwipe(x, y, id, target) {
       touchStart = null;
-      if (Math.abs(dx) >= 60 && Math.abs(dx) > Math.abs(dy) * 1.5) goTo(current + (dx < 0 ? 1 : -1));
-    });
-    deck.addEventListener("pointercancel", () => { touchStart = null; });
+      if (openPanel || !(target instanceof Element) || target.closest("button, a, input, select, textarea, summary, [role='button'], [contenteditable='true'], video[controls]")) return;
+      touchStart = { x, y, id, slide:current, axis:null };
+    }
+    function moveSwipe(x, y, id, event) {
+      if (!touchStart || touchStart.id !== id) return;
+      const dx = Math.abs(x - touchStart.x);
+      const dy = Math.abs(y - touchStart.y);
+      if (!touchStart.axis && Math.max(dx, dy) >= 10) {
+        if (dx > dy * 1.4) touchStart.axis = "x";
+        else if (dy > dx) touchStart.axis = "y";
+      }
+      if (touchStart.axis === "x" && event.cancelable) event.preventDefault();
+    }
+    function finishSwipe(x, y, id, event) {
+      if (!touchStart || touchStart.id !== id) return;
+      const start = touchStart;
+      touchStart = null;
+      if (openPanel || start.slide !== current || start.axis === "y") return;
+      const dx = x - start.x;
+      const dy = y - start.y;
+      const threshold = Math.min(64, Math.max(32, window.innerWidth * .09));
+      if (Math.abs(dx) < threshold || Math.abs(dx) <= Math.abs(dy) * 1.4) return;
+      if (event.cancelable) event.preventDefault();
+      goTo(current + (dx < 0 ? 1 : -1));
+    }
+    // Touch Events avoid browser-specific pointer cancellation during scrolling.
+    // Horizontal motion belongs to the deck; vertical motion and pinch remain native.
+    if ("ontouchstart" in window) {
+      viewport.addEventListener("touchstart", (event) => {
+        if (event.touches.length !== 1) { touchStart = null; return; }
+        const touch = event.touches[0];
+        beginSwipe(touch.clientX, touch.clientY, touch.identifier, event.target);
+      }, { passive:true });
+      viewport.addEventListener("touchmove", (event) => {
+        if (event.touches.length !== 1) { touchStart = null; return; }
+        const touch = event.touches[0];
+        moveSwipe(touch.clientX, touch.clientY, touch.identifier, event);
+      }, { passive:false });
+      viewport.addEventListener("touchend", (event) => {
+        if (event.touches.length) { touchStart = null; return; }
+        const touch = Array.from(event.changedTouches).find(item => item.identifier === touchStart?.id);
+        if (touch) finishSwipe(touch.clientX, touch.clientY, touch.identifier, event);
+        else touchStart = null;
+      }, { passive:false });
+      viewport.addEventListener("touchcancel", () => { touchStart = null; });
+    } else if (window.PointerEvent) {
+      viewport.addEventListener("pointerdown", (event) => {
+        if (event.pointerType === "mouse") return;
+        if (!event.isPrimary) { touchStart = null; return; }
+        beginSwipe(event.clientX, event.clientY, event.pointerId, event.target);
+        if (touchStart) {
+          try { viewport.setPointerCapture(event.pointerId); } catch (_) { /* capture is optional */ }
+        }
+      });
+      viewport.addEventListener("pointermove", (event) => moveSwipe(event.clientX, event.clientY, event.pointerId, event));
+      window.addEventListener("pointerup", (event) => finishSwipe(event.clientX, event.clientY, event.pointerId, event));
+      window.addEventListener("pointercancel", () => { touchStart = null; });
+    }
+    window.addEventListener("blur", () => { touchStart = null; });
     window.addEventListener("hashchange", () => goTo(readHash(), false));
     window.addEventListener("resize", () => { if (!resizeFrame) resizeFrame = requestAnimationFrame(fit); });
     document.addEventListener("visibilitychange", syncMedia);
