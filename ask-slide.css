@@ -23,6 +23,7 @@
 .ask-context-lg { color:#aab9ff; }
 .ask-product { margin-top:15px; color:#d9dde7; font:400 19px/1.4 var(--font-body); letter-spacing:-.02em; }
 .ask-product span { color:#a5adbe; }
+.ask-slide.is-active ~ .deck-controls .control-hint { visibility:hidden; }
 .ask-slide.is-active .ask-raise,
 .ask-slide.is-active .ask-allocation,
 .ask-slide.is-active .ask-milestone-label,
