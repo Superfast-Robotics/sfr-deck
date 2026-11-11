@@ -12,7 +12,9 @@
 .factory-film figcaption span { color:#747e92; }
 .success-slide .network-event { top:696px; }
 .success-slide .qualifier { font-size:12px; }
-.evidence-playback { position:absolute; right:64px; top:775px; font:14px/1.3 Plex,monospace; color:#aeb9d0; }
+.evidence-playback { position:absolute; right:64px; top:775px; display:flex; align-items:center; gap:12px; margin:0; padding:7px 14px 7px 10px; border:1px solid #8194ff70; border-radius:8px; background:#8194ff16; font:15px/1.3 Plex,monospace; color:#d1d8ec; }
+.evidence-playback strong { font:600 28px/1 var(--font-body,Arial,sans-serif); letter-spacing:-.04em; color:#a9b6ff; }
+.evidence-playback span { font-size:13px; font-weight:500; letter-spacing:.08em; }
 
 /* Slide 6: an editable, continuously active onboard compute diagram. */
 .solution-copy .solution-title { font-size:74px; margin-top:55px; }

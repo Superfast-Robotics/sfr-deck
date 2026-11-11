@@ -9,7 +9,7 @@ window.PITCH_MEDIA = {
     "sourceUrl": "https://superfastrobotics.com/writings/demo-001.html"
   },
   "hero": {
-    "src": "assets/rollout-reel-web.mp4",
+    "src": "assets/rollout-reel-web.mp4?v=20261110-trim",
     "poster": "assets/rollout-reel-poster.jpg",
     "title": "18 Superfast Robotics evaluation rollouts, edited at 6x speed",
     "sourceUrl": "https://superfastrobotics.com/writings/demo-001.html"
