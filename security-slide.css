@@ -1,0 +1,57 @@
+/* On-device security concept. The scene stays within the right-hand visual. */
+.security-visual {
+  position:absolute;
+  left:790px;
+  top:138px;
+  width:746px;
+  height:640px;
+  pointer-events:none;
+  isolation:isolate;
+}
+.security-visual:before {
+  content:'';
+  position:absolute;
+  inset:72px 54px 62px 96px;
+  z-index:-1;
+  border-radius:50%;
+  background:radial-gradient(ellipse,#334fb51c 0%,#2237780a 48%,transparent 70%);
+}
+.security-visual .live-motion-canvas { position:absolute; inset:0; width:100%; height:100%; }
+.security-fallback {
+  position:absolute;
+  left:143px;
+  top:102px;
+  width:430px;
+  height:430px;
+  border:1px solid #8aa7ef73;
+  border-radius:50%;
+  background:radial-gradient(circle,#6c87e312 0%,#445cba09 64%,#7798ed21 97%,transparent 100%);
+  box-shadow:0 0 50px #536fe314,inset 0 0 32px #516ed01c;
+}
+.security-fallback:before,.security-fallback:after {
+  content:'';
+  position:absolute;
+  inset:58px -34px;
+  border:1px solid #8da9f0b0;
+  border-radius:50%;
+  transform:rotate(-28deg);
+}
+.security-fallback:after { inset:-15px 96px; transform:rotate(28deg); border-color:#6f91e84a; }
+.security-fallback i {
+  position:absolute;
+  width:153px;
+  height:153px;
+  left:138px;
+  top:153px;
+  transform:perspective(600px) rotateX(42deg) rotateZ(-30deg);
+  border:1px solid #b6caed;
+  background:linear-gradient(145deg,#324d7c,#151e33);
+  box-shadow:0 6px 0 #586c91,0 14px 0 #111d34,0 18px 0 #344666,0 28px 30px #0005;
+}
+.security-fallback b { position:absolute; left:0; right:0; top:196px; color:#dce6ff; font:500 37px var(--font-label,monospace); letter-spacing:.05em; text-align:center; }
+.security-fallback span { position:absolute; top:56px; right:39px; color:#bacbff; font:34px/1 Arial,sans-serif; text-shadow:0 0 14px #6788ff; }
+.security-visual.has-live-motion .security-fallback { visibility:hidden; }
+@media print {
+  .security-visual .live-motion-canvas { display:none; }
+  .security-visual.has-live-motion .security-fallback { visibility:visible; }
+}

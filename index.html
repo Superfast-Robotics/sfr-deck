@@ -25,6 +25,8 @@
   <link rel="stylesheet" href="jetson-brand.css">
   <link rel="stylesheet" href="media-performance.css?v=20261110-smooth">
   <link rel="stylesheet" href="touch-navigation.css?v=20261110-touch">
+  <link rel="stylesheet" href="security-copy.css?v=20261113-security">
+  <link rel="stylesheet" href="security-slide.css?v=20261113-security">
   <script src="media.js?v=20261110-trim" defer></script>
   <script src="pitch.js?v=20261110-no-notes" defer></script>
   <script src="assets/vendor/three-r160.min.js" defer></script>
@@ -37,6 +39,7 @@
   <script src="motion-enhanced.js" defer></script>
   <script src="cover-orbit.js?v=20261110-smooth" defer></script>
   <script src="team-orbits.js?v=20261110-smooth" defer></script>
+  <script src="security-slide.js?v=20261113-security" defer></script>
 </head>
 <body>
   <main id="viewport" aria-label="Superfast Robotics pitch presentation">
@@ -148,7 +151,21 @@
         <div class="binary-target"><span class="eyebrow">NEXT</span><strong>Super-Efficient<br>Binary Inference<br>Chip</strong></div>
       </section>
 
-      <section class="slide team-slide" id="slide-12" data-title="Team" aria-label="Slide 12" aria-hidden="true" inert>
+      <section class="slide security-slide" id="slide-12" data-title="Impossible to hack. Our ambition." aria-label="Slide 12" aria-hidden="true" inert>
+        <div class="security-copy">
+          <p class="eyebrow security-kicker motion-reveal">OUR AMBITION</p>
+          <h2 class="security-title motion-reveal" style="--enter-delay:.12s">Impossible<br><em>to hack.</em></h2>
+          <p class="security-vision motion-reveal" style="--enter-delay:.22s">The world's most secure robot.</p>
+          <div class="security-principles">
+            <div class="security-principle motion-reveal" style="--enter-delay:.32s"><span class="security-number">01</span><div><h3>No network connection.</h3><p>Intelligence stays on board.</p></div></div>
+            <div class="security-principle motion-reveal" style="--enter-delay:.43s"><span class="security-number">02</span><div><span class="security-next">NEXT</span><h3>Homomorphic encryption.</h3><p>Compute on encrypted data.</p></div></div>
+          </div>
+        </div>
+        <div class="security-visual" role="img" aria-label="Concept: on-device intelligence inside an encrypted boundary, disconnected from an external network"><div class="security-fallback" aria-hidden="true"><i></i><b>NX</b><span>✦</span></div></div>
+        <div class="security-chip-caption"><span>ON-DEVICE INTELLIGENCE</span><strong>Jetson Orin NX</strong></div>
+      </section>
+
+      <section class="slide team-slide" id="slide-13" data-title="Team" aria-label="Slide 13" aria-hidden="true" inert>
         <p class="eyebrow team-kicker">TEAM</p>
         <h2 class="team-heading motion-reveal">Four researchers who worked<br>together at <em>Samsung Research</em></h2>
         <div class="team-members">
@@ -171,7 +188,7 @@
         </div>
       </section>
 
-      <section class="slide ask-slide" id="slide-13" data-title="The Ask" aria-label="Slide 13" aria-hidden="true" inert>
+      <section class="slide ask-slide" id="slide-14" data-title="The Ask" aria-label="Slide 14" aria-hidden="true" inert>
         <h2 class="slide-title">The Ask</h2>
         <p class="ask-raise" aria-label="Raising eight million US dollars"><span>$</span>8M</p>
         <dl class="ask-allocation" aria-label="Use of funds">
@@ -188,7 +205,7 @@
         </ol>
       </section>
 
-      <section class="slide closing-slide" id="slide-14" data-title="Robot intelligence belongs on board" aria-label="Slide 14" aria-hidden="true" inert>
+      <section class="slide closing-slide" id="slide-15" data-title="Robot intelligence belongs on board" aria-label="Slide 15" aria-hidden="true" inert>
         <div class="ambient closing-film"><video data-media="robot" data-autoplay muted loop playsinline preload="none"></video></div><div class="closing-shade"></div>
         <canvas class="cover-orbit cover-orbit-back" width="1080" height="650" aria-hidden="true"></canvas>
         <h2>Robot intelligence<br>belongs <em>on board.</em></h2>
@@ -200,7 +217,7 @@
       <footer class="deck-controls" aria-label="Presentation controls">
         <div class="control-tools"><button id="toggle-overview" type="button" title="Slide overview (O)" aria-label="Slide overview">▦</button><button id="toggle-motion" type="button" title="Pause or resume motion (P)" aria-label="Pause motion">Ⅱ</button><button id="fullscreen" type="button" title="Full screen (F)" aria-label="Full screen">⛶</button></div>
         <span class="control-hint">← → to navigate</span>
-        <div class="control-pagination"><button id="prev-slide" type="button" aria-label="Previous slide">←</button><span><span id="current-slide">01</span><span class="page-slash">/</span><span id="total-slides">14</span></span><button id="next-slide" type="button" aria-label="Next slide">→</button></div>
+        <div class="control-pagination"><button id="prev-slide" type="button" aria-label="Previous slide">←</button><span><span id="current-slide">01</span><span class="page-slash">/</span><span id="total-slides">15</span></span><button id="next-slide" type="button" aria-label="Next slide">→</button></div>
       </footer>
       <div class="progress-track" aria-hidden="true"><div id="progress-fill"></div></div>
     </div>
